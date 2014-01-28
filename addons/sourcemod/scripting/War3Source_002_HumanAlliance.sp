@@ -21,7 +21,7 @@ new Float:TeleportDistance[5]={0.0,600.0,700.0,850.0,1000.0};
 //new Float:TeleportDistance[5]={0.0,240.0,240.0,240.0,240.0};
 
 new Float:InvisibilityAlphaTF[5]={1.0,0.84,0.68,0.56,0.40};
-
+new Float:InvisibilityChanceCSGO[5]={1.0,0.72,0.80,0.85,0.90};
 new Float:InvisibilityAlphaCS[5]={1.0,0.90,0.8,0.7,0.6};
 
 
@@ -109,6 +109,7 @@ public OnWar3EventSpawn(client)
 public ActivateSkills(client)
 {
     new skill_devo=War3_GetSkillLevel(client,thisRaceID,SKILL_HEALTH);
+    new skill_invis=War3_GetSkillLevel(client,thisRaceID,SKILL_INVIS);
     if(skill_devo)
     {
         // Devotion Aura
@@ -128,6 +129,14 @@ public ActivateSkills(client)
         TE_SetupBeamRingPoint(vec,40.0,10.0,BeamSprite,HaloSprite,0,15,1.0,15.0,0.0,ringColor,10,0);
         TE_SendToAll();
         
+    }
+    if(skill_invis)
+    {
+    	if(W3Chance(InvisibilityChanceCSGO[skill_invis]))
+	{
+		SetEntityRenderFx(client, RenderFx:RENDERFX_FLICKER_SLOW);
+		PrintToChat(client, "Invisibility: You have successfully used your invisibility skill and are now partially invisible.");
+	}
     }
 }
 

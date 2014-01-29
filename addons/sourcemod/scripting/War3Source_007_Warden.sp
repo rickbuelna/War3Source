@@ -65,7 +65,7 @@ new MyWeaponsOffset,AmmoOffset;//,Clip1Offset;
 public OnPluginStart()
 {
     
-    ultCooldownCvar=CreateConVar("war3_warden_vengence_cooldown","20","Cooldown between Warden Vengence (ultimate)");
+    ultCooldownCvar=CreateConVar("war3_warden_vengence_cooldown","30","Cooldown between Warden Vengence (ultimate)");
     
     CreateTimer(0.2,CalcBlink,_,TIMER_REPEAT);
     OriginOffset=FindSendPropOffs("CBaseEntity","m_vecOrigin");
@@ -330,7 +330,7 @@ public RoundStartEvent(Handle:event,const String:name[],bool:dontBroadcast)
 
 public StartMole(client)
 {
-    new Float:mole_time=5.0;
+    new Float:mole_time=0.3;
     W3MsgMoleIn(client,mole_time);
     CreateTimer(0.2+mole_time,DoMole,client);
 }

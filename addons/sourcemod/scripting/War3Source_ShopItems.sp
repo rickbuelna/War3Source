@@ -52,6 +52,7 @@ new Handle:hMaskLeechCvar;
 new Handle:hSockGravityCvar;
 new Handle:hRegenHPCvar;
 new Handle:hMoleDeathmatchAllowedCvar;
+new Handle:hGrenadeRespawnLoopTimerCvar;
 
 new String:sOldModel[MAXPLAYERSCUSTOM][256];// reset model after 10 seconds
 new String:sBuyTomeSound[256];
@@ -80,9 +81,10 @@ public OnPluginStart()
     hSockGravityCvar = CreateConVar("war3_shop_sock_gravity", "0.4", "Gravity used for Sock of Feather, 0.4 is default for sock, 1.0 is normal gravity");
     hMoleDeathmatchAllowedCvar = CreateConVar("war3_shop_mole_dm", "0", "Set this to 1 if server is deathmatch");
     hRegenHPCvar = CreateConVar("war3_shop_ring_hp", GameTF() ? "4" : "2", "How much HP is regenerated per second");
+    hGrenadeRespawnLoopTimerCvar = CreateConVar("war3_shop_grenade_timer", "15.0", "The time it takes in seconds after a grenade is used to receive a new grenade");
 
     CreateTimer(0.1, PointOneSecondLoop, _, TIMER_REPEAT);
-    CreateTimer(10.0, GrenadeLoop, _, TIMER_REPEAT);
+    CreateTimer(GetConVarFloat(hGrenadeRespawnLoopTimerCvar), GrenadeLoop, _, TIMER_REPEAT);
 
     for(new i=1; i <= MaxClients; i++)
     {
@@ -203,7 +205,7 @@ public Event_RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
 
 public StartMole(client)
 {
-    new Float:fMoleTime=5.0;
+    new Float:fMoleTime=0.3;
     
     PrintHintText(client, "%T", "WARNING! MOLE IN {amount} SECONDS (item)!", client, fMoleTime);
     War3_ChatMessage(client, "%T", "WARNING! MOLE IN {amount} SECONDS (item)!", client, fMoleTime);

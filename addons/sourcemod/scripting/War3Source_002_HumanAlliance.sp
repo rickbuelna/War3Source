@@ -13,17 +13,17 @@ public Plugin:myinfo =
 new thisRaceID;
 
 new Handle:ultCooldownCvar;
+new Handle:invisCooldownCvar;
 
 // Chance/Info Arrays
 new Float:BashChance[5]={0.0,0.07,0.13,0.19,0.25};
-new Float:TeleportDistance[5]={0.0,600.0,700.0,850.0,1000.0};
+new Float:TeleportDistance[5]={0.0,600.0,700.0,850.0,10000.0};
 //TEST ONLY
-//new Float:TeleportDistance[5]={0.0,240.0,240.0,240.0,240.0};
+//new Float:TeleportDistance[5]={0.0,240.0,240.0,240.0,600.0};
 
 new Float:InvisibilityAlphaTF[5]={1.0,0.84,0.68,0.56,0.40};
-new Float:InvisibilityChanceCSGO[5]={1.0,0.72,0.80,0.85,0.90};
 new Float:InvisibilityAlphaCS[5]={1.0,0.90,0.8,0.7,0.6};
-
+new Float:InvisibilityDuration[5]={3.0,3.5,4.0,4.5,5.0};
 
 new DevotionHealth[5]={0,15,25,35,45};
 
@@ -46,7 +46,8 @@ new String:teleportSound[256];
 
 public OnPluginStart()
 {
-    ultCooldownCvar = CreateConVar("war3_human_teleport_cooldown","20.0","Cooldown between teleports");
+    ultCooldownCvar = CreateConVar("war3_human_teleport_cooldown","30.0","Cooldown between teleports");
+    invisCooldownCvar = CreateConVar("war3_human_invis_cooldown","20.0","Cooldown between invisibilities");
     
     LoadTranslations("w3s.race.human.phrases");
 }
@@ -109,7 +110,6 @@ public OnWar3EventSpawn(client)
 public ActivateSkills(client)
 {
     new skill_devo=War3_GetSkillLevel(client,thisRaceID,SKILL_HEALTH);
-    new skill_invis=War3_GetSkillLevel(client,thisRaceID,SKILL_INVIS);
     if(skill_devo)
     {
         // Devotion Aura
@@ -129,14 +129,6 @@ public ActivateSkills(client)
         TE_SetupBeamRingPoint(vec,40.0,10.0,BeamSprite,HaloSprite,0,15,1.0,15.0,0.0,ringColor,10,0);
         TE_SendToAll();
         
-    }
-    if(skill_invis)
-    {
-    	if(W3Chance(InvisibilityChanceCSGO[skill_invis]))
-	{
-		SetEntityRenderFx(client, RenderFx:RENDERFX_FLICKER_SLOW);
-		PrintToChat(client, "Invisibility: You have successfully used your invisibility skill and are now partially invisible.");
-	}
     }
 }
 
@@ -188,6 +180,37 @@ public OnUltimateCommand(client,race,bool:pressed)
 
 }
 
+public OnAbilityCommand(client,ability,bool:pressed)
+{
+    if(War3_GetRace(client)==thisRaceID && ability==0 && pressed && IsPlayerAlive(client))
+    {
+        new skill_level=War3_GetSkillLevel(client,thisRaceID,SKILL_INVIS);
+	if(skill_level>0)
+        {
+             if(!Silenced(client)&&War3_SkillNotInCooldown(client,thisRaceID,SKILL_INVIS,true))
+             {
+                 SetEntityRenderMode(client, RENDER_NONE);
+                 new Float:cooldown=GetConVarFloat(invisCooldownCvar);
+                 War3_CooldownMGR(client,cooldown,thisRaceID,SKILL_INVIS,_,_);
+                 PrintToChat(client, "Invisibility: You are now Invisible!");
+                 CreateTimer(InvisibilityDuration[skill_level],EndInvisibility,client); 
+             }
+             else
+             {
+                 PrintToChat(client, "Invisibility: You are silenced!");
+             }
+        }
+    }
+}
+
+public Action:EndInvisibility(Handle:timer,any:client)
+{
+    if(ValidPlayer(client,true))
+    {
+	PrintToChat(client, "Invisibility: You are now Visible!");
+	SetEntityRenderMode(client, RENDER_NORMAL);
+    }
+}
 
 
 public OnSkillLevelChanged(client,race,skill,newskilllevel)

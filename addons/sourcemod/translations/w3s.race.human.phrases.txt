@@ -15,7 +15,7 @@
 	}
 	"human_skill_Invisibility_desc"
 	{
-		"en"		"Makes you partially invisible\nReduces visibility to #1#."
+		"en"		"Makes you invisible\nbind to +ability\nReduces visibility to #1#."
 	}
 
 	"human_skill_DevotionAura"

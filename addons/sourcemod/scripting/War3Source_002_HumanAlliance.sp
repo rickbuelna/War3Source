@@ -43,11 +43,12 @@ new bool:inteleportcheck[MAXPLAYERSCUSTOM];
 
 //new String:teleportSound[]="war3source/blinkarrival.wav";
 new String:teleportSound[256];
+new String:stealthSound[256];
 
 public OnPluginStart()
 {
     ultCooldownCvar = CreateConVar("war3_human_teleport_cooldown","30.0","Cooldown between teleports");
-    invisCooldownCvar = CreateConVar("war3_human_invis_cooldown","20.0","Cooldown between invisibilities");
+    invisCooldownCvar = CreateConVar("war3_human_invis_cooldown","30.0","Cooldown between invisibilities");
     
     LoadTranslations("w3s.race.human.phrases");
 }
@@ -95,11 +96,12 @@ public OnWar3LoadRaceOrItemOrdered(num)
 public OnMapStart()
 {
     War3_AddSoundFolder(teleportSound, sizeof(teleportSound), "blinkarrival.mp3");
-
+    War3_AddSoundFolder(stealthSound, sizeof(stealthSound), "stealth.mp3");
     BeamSprite=War3_PrecacheBeamSprite();
     HaloSprite=War3_PrecacheHaloSprite();
     
     War3_AddCustomSound(teleportSound);
+    War3_AddCustomSound(stealthSound);
 }
 
 
@@ -187,13 +189,17 @@ public OnAbilityCommand(client,ability,bool:pressed)
         new skill_level=War3_GetSkillLevel(client,thisRaceID,SKILL_INVIS);
 	if(skill_level>0)
         {
-             if(!Silenced(client)&&War3_SkillNotInCooldown(client,thisRaceID,SKILL_INVIS,true))
-             {
-                 SetEntityRenderMode(client, RENDER_NONE);
-                 new Float:cooldown=GetConVarFloat(invisCooldownCvar);
-                 War3_CooldownMGR(client,cooldown,thisRaceID,SKILL_INVIS,_,_);
-                 PrintToChat(client, "Invisibility: You are now Invisible!");
-                 CreateTimer(InvisibilityDuration[skill_level],EndInvisibility,client); 
+             if(!Silenced(client))
+	     {
+                 if(War3_SkillNotInCooldown(client,thisRaceID,SKILL_INVIS,true))
+                 {
+                     SetEntityRenderMode(client, RENDER_NONE);
+                     EmitSoundToAll(stealthSound,client);
+                     PrintToChat(client, "Invisibility: You are now Invisible!");
+                     new Float:cooldown=GetConVarFloat(invisCooldownCvar);
+                     War3_CooldownMGR(client,cooldown,thisRaceID,SKILL_INVIS,_,_);
+                     CreateTimer(InvisibilityDuration[skill_level],EndInvisibility,client);
+                 }
              }
              else
              {

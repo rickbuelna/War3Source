@@ -123,7 +123,7 @@ public OnWar3LoadRaceOrItemOrdered(num)
         iShopitem[ITEM_HEALTH] = War3_CreateShopItemT("health", 3);
         iShopitem[ITEM_RESPAWN] = War3_CreateShopItemT("scroll", 15, false);
         
-        War3_AddItemBuff(iShopitem[ITEM_HEALTH], iAdditionalMaxHealth, 50);
+        War3_AddItemBuff(iShopitem[ITEM_HEALTH], iAdditionalMaxHealth, 30);
 
         iShopitem[ITEM_TOME] = War3_CreateShopItemT("tome", 10);
         War3_SetItemProperty(iShopitem[ITEM_TOME], ITEM_USED_ON_BUY, true);
@@ -233,8 +233,8 @@ public OnWar3EventSpawn(client)
     
     if(War3_GetOwnsItem(client, iShopitem[ITEM_HEALTH]))
     {
-        War3_SetBuffItem(client, iAdditionalMaxHealth, iShopitem[ITEM_HEALTH], 50);
-        War3_ChatMessage(client, "%T", "+50 HP", client);
+        War3_SetBuffItem(client, iAdditionalMaxHealth, iShopitem[ITEM_HEALTH], 30);
+        War3_ChatMessage(client, "%T", "+30 HP", client);
     }
     
     if(War3_GetOwnsItem(client, iShopitem[ITEM_SOCK]))
@@ -350,7 +350,7 @@ public OnItemPurchase(client,item)
     
     if(War3_GetGame() != Game_TF && item == iShopitem[ITEM_HEALTH] && IsPlayerAlive(client))
     {
-        War3_ChatMessage(client, "%T", "+50 HP", client);
+        War3_ChatMessage(client, "%T", "+30 HP", client);
     }
     
     if(item == iShopitem[ITEM_TOME])

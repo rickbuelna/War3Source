@@ -11,26 +11,21 @@ public Plugin:myinfo =
 };
 
 new thisRaceID;
-
 new Handle:ultCooldownCvar;
 new Handle:invisCooldownCvar;
 
 // Chance/Info Arrays
 new Float:BashChance[5]={0.0,0.07,0.13,0.19,0.25};
 new Float:TeleportDistance[5]={0.0,600.0,700.0,850.0,10000.0};
-//TEST ONLY
-//new Float:TeleportDistance[5]={0.0,240.0,240.0,240.0,600.0};
-
 new Float:InvisibilityAlphaTF[5]={1.0,0.84,0.68,0.56,0.40};
 new Float:InvisibilityAlphaCS[5]={1.0,0.90,0.8,0.7,0.6};
 new Float:InvisibilityDuration[5]={3.0,3.5,4.0,4.5,5.0};
-
 new DevotionHealth[5]={0,15,25,35,45};
-
 
 // Effects
 new BeamSprite,HaloSprite;
 
+// Skills
 new GENERIC_SKILL_TELEPORT;
 new SKILL_INVIS, SKILL_BASH, SKILL_HEALTH,ULT_TELEPORT;
 
@@ -55,38 +50,22 @@ public OnPluginStart()
 
 public OnWar3LoadRaceOrItemOrdered(num)
 {
-    //if(GAMECSANY)
-    //{
     if(num == 1)
     {
         GENERIC_SKILL_TELEPORT=War3_CreateGenericSkill("g_teleport");
     }
     if(num == 20)
     {
-    
-        
-        
-        
         thisRaceID=War3_CreateNewRaceT("human");
-        SKILL_INVIS=War3_AddRaceSkillT(thisRaceID,"Invisibility",false,4,"60% (CS), 40% (TF)");
+        SKILL_INVIS=War3_AddRaceSkillT(thisRaceID,"Invisibility",false,4,"100%");
         SKILL_HEALTH=War3_AddRaceSkillT(thisRaceID,"DevotionAura",false,4,"15/25/35/45");
         SKILL_BASH=War3_AddRaceSkillT(thisRaceID,"Bash",false,4,"7/13/19/25%","0.2");
-        //if(GAMETF)
-        //{
-        //    ULT_TELEPORT=War3_AddRaceSkillT(thisRaceID,"Teleport",true,4,"600/800/1000/1200");
-        //}
-        //else
-        //{
         new Handle:genericSkillOptions=CreateArray(5,2); //block size, 5 can store an array of 5 cells
         SetArrayArray(genericSkillOptions,0,TeleportDistance,sizeof(TeleportDistance));
         SetArrayCell(genericSkillOptions,1,ultCooldownCvar);
         ULT_TELEPORT=War3_UseGenericSkill(thisRaceID,"g_teleport",genericSkillOptions,"Teleport","",true,true);
-        //}
-        
         W3SkillCooldownOnSpawn(thisRaceID,ULT_TELEPORT,10.0,_);
-        
         War3_CreateRaceEnd(thisRaceID);
-        
         War3_AddSkillBuff(thisRaceID, SKILL_BASH, fBashChance, BashChance);
         War3_AddSkillBuff(thisRaceID, SKILL_INVIS, fInvisibilitySkill, GameTF() ? InvisibilityAlphaTF : InvisibilityAlphaCS);
         War3_AddSkillBuff(thisRaceID, SKILL_HEALTH, iAdditionalMaxHealth, DevotionHealth);
@@ -291,12 +270,10 @@ bool:Teleport(client,Float:distance)
             return false; //it returned 0 0 0
         }
         
-        
         TeleportEntity(client,emptypos,NULL_VECTOR,NULL_VECTOR);
+	W3FlashScreen(client, RGBA_COLOR_WHITE, 0.3, _, FFADE_OUT);
         EmitSoundToAll(teleportSound,client);
         EmitSoundToAll(teleportSound,client);
-        
-        
         
         teleportpos[client][0]=emptypos[0];
         teleportpos[client][1]=emptypos[1];
@@ -304,11 +281,6 @@ bool:Teleport(client,Float:distance)
         
         inteleportcheck[client]=true;
         CreateTimer(0.14,checkTeleport,client);
-        
-        
-        
-        
-        
         
         return true;
     }

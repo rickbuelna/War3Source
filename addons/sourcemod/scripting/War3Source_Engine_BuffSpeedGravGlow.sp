@@ -91,7 +91,12 @@ public NW3GetSpeedMulti(Handle:plugin,numParams)
     return _:1.0;
 }
 
-
+public GetServerGravity()
+{
+	decl String:buffer[128];
+	GetConVarString(FindConVar("sv_gravity"), buffer, sizeof(buffer));
+	return StringToInt(buffer);
+}
 
 public Action:DeciSecondTimer(Handle:timer)
 {
@@ -107,20 +112,19 @@ public Action:DeciSecondTimer(Handle:timer)
                 new Float:gravity=1.0; //default
                 if(!W3GetBuffHasTrue(client,bLowGravityDenyAll)&&!W3GetBuffHasTrue(client,bBuffDenyAll)) //can we change gravity?
                 {
-                    //if(!W3GetBuffHasTrue(client,bLowGravityDenySkill)){
-                    new Float:gravity1=W3GetBuffMinFloat(client,fLowGravitySkill);
-                    //}
-                    //if(!W3GetBuffHasTrue(client,bLowGravityDenyItem)){
-                    new Float:gravity2=W3GetBuffMinFloat(client,fLowGravityItem);
-                    
-                    gravity=gravity1<gravity2?gravity1:gravity2;
-                    //}
-                    //gravity=; //replace
-                    //PrintToChat(client,"mingrav=%f",gravity);
+                    new Float:gravitySkill=W3GetBuffMinFloat(client,fLowGravitySkill);
+                    new Float:gravityItem=W3GetBuffMinFloat(client,fLowGravityItem);
+                    gravity=gravitySkill<gravityItem?gravitySkill:gravityItem;
                 }
-                ///now lets set the grav
-                if(GetEntityGravity(client)!=gravity){ ///gravity offset is somewhoe different for each person? this offset is got on PutInServer
-                    SetEntityGravity(client,gravity);
+                
+		// make sure the gravity is set to default
+		if(GetServerGravity()==800)
+		{
+			///now lets set the grav
+        	        if(GetEntityGravity(client)!=gravity)
+			{ ///gravity offset is somewhoe different for each person? this offset is got on PutInServer
+                	    SetEntityGravity(client,gravity);
+			}
                 }
                 
                 
@@ -333,7 +337,7 @@ public OnGameFrame()
                         
                         
                         
-                    //    if(true||    speedBefore[client]>3.0){ //reapply speed, using previous cached base speed, make sure the cache isnt' zero lol 
+                    //    if(true||    speedBefore[client]>3.0){ //reapply speed, using previous cached base speed, make sure the cache isnt zero lol 
                             new Float:speedmulti=1.0;
     
                             //DP("before");
